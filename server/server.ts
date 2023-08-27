@@ -1,16 +1,19 @@
-import * as path from 'path'
-import express from 'express'
+import WebSocket from 'ws';
+import { v4 as uuidv4 } from 'uuid'
+import { ExtWebSocket } from './typings';
 
-const http = require('http')
-const app = express()
-const server = http.createServer(app)
-export default server
+const server = new WebSocket.Server({ port: 8080 });
 
-import routes from './routes'
+server.on('connection', (ws: ExtWebSocket) => {
+  ws.id = uuidv4()
+  console.log(`New client connected: ${ws.id}`);
 
-app.use(routes)
+  ws.on('message', (message: string) => {
+    console.log(`Received message: ${message}`);
+    ws.send(`Server received your message: ${message}`);
+  });
 
-const PORT = 3000 || process.env.PORT
-server.listen(PORT, () => {
-    console.log(`Server runnig on port: ${PORT}`)
-})
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
