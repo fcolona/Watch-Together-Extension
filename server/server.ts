@@ -99,7 +99,27 @@ server.on('connection', (ws: ExtWebSocket) => {
             server.clients.forEach( (socket: ExtWebSocket) => {
               //Check if the socket is in the room, is open and is not the sender itself
               if(socket.id == socketInRoomId && socket.readyState === WebSocket.OPEN && socket !== ws){
-                let dataToBeSent: Data = {event: "play" }
+                let dataToBeSent: Data = {event: "play", payload: data.payload }
+                socket.send(JSON.stringify(dataToBeSent))
+              }
+            })
+          })
+        }
+      })
+    }
+    //PAYLOAD HERE IS THE CURRENT VIDEO TIME
+    else if(data.event == "syncTime"){
+      server.rooms.forEach( (room) => {
+        //Search for the room which the socket is in
+        if(room.id == ws.roomId){
+          //Iterate through the sockets in the room
+          room.sockets.forEach( (socketInRoomId) => {
+            //Iterate through all sockets
+            //@ts-ignore
+            server.clients.forEach( (socket: ExtWebSocket) => {
+              //Check if the socket is in the room, is open and is not the sender itself
+              if(socket.id == socketInRoomId && socket.readyState === WebSocket.OPEN && socket !== ws){
+                let dataToBeSent: Data = {event: "syncTime", payload: data.payload }
                 socket.send(JSON.stringify(dataToBeSent))
               }
             })

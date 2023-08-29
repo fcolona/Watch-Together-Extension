@@ -1,29 +1,53 @@
+const video = document.querySelector("video")
+
 //Setup WebSocket
 const ws = new WebSocket("ws://localhost:8080");
-
-//Add emit function in order to send custom message types
-//WebSocket.prototype.emit = function (eventName, payload) {
-  //this.send(JSON.stringify({eventName, payload}));
-//}
 
 //Open connection
 ws.onopen = function(event){
     console.log("WebSocket is connected")
     ws.send(JSON.stringify({ event: "createRoom" }))
+
+    ws.addEventListener("message", (event) => {
+        let data = JSON.parse(event.data)
+        console.log(data.event)
+        
+        if(data.event == "pause"){
+            video.pause()            
+            video.currentTime = data.payload
+        }
+        if(data.event == "play"){
+            video.play()
+            video.currentTime = data.payload
+        }
+        if(data.event == "syncTime"){
+            video.currentTime = data.payload
+        }
+    })
+
 }
 
 
 //ws.onmessage = (message) => alert(`Your room id is: ${message.data}`)
 
+let lastSyncedTime = 0.0
 function handleEvent(event){
     if(event.type == "pause"){
-        console.log("PAUSED")
-        ws.send(JSON.stringify({ event: "pause" }))
+        if(Math.round(lastSyncedTime) !== Math.round(video.currentTime) && video.seeking == false){
+            lastSyncedTime = video.currentTime
+            ws.send(JSON.stringify({ event: "pause", payload: video.currentTime }))
+        }
     }
     else if(event.type == "play"){
-        console.log("PLAYED")
-        ws.send(JSON.stringify({ event: "play" }))
+        ws.send(JSON.stringify({ event: "play", payload: video.currentTime }))
+    }
+    else if(event.type == "onseeking"){
+        if(Math.round(lastSyncedTime) !== Math.round(video.currentTime) && video.paused == true){
+            lastSyncedTime = video.currentTime
+            ws.send(JSON.stringify({ event: "syncTime", payload: video.currentTime }))
+        }
     }
 }
-document.querySelector("video").addEventListener("play", handleEvent)
-document.querySelector("video").addEventListener("pause", handleEvent)
+video.addEventListener("play", handleEvent)
+video.addEventListener("pause", handleEvent)
+video.addEventListener("onseeking", handleEvent)
