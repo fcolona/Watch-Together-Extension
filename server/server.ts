@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 interface Data{
     event: string
-    payload: string | number
+    payload?: string | number
 }
 
 class Room{
@@ -53,10 +53,12 @@ server.on('connection', (ws: ExtWebSocket) => {
       console.log(`New room created: ${roomId}`)
       
       //Send room id back to client
-      ws.send(`${roomId}`)
+      let dataToBeSent = JSON.stringify({event: "roomId", payload: roomId})
+      ws.send(dataToBeSent)
     }
     else if(data.event == "enterRoom"){
       server.rooms.forEach( (room) => {
+        //Search for the room with given id
         if(room.id == data.payload){
           //Add socket to room
           room.sockets.push(ws.id)
@@ -66,11 +68,44 @@ server.on('connection', (ws: ExtWebSocket) => {
         }
       })
     }
+    //PAYLOAD HERE IS THE CURRENT VIDEO TIME
     else if(data.event == "pause"){
-      console.log("PAUSE")
+      server.rooms.forEach( (room) => {
+        //Search for the room which the socket is in
+        if(room.id == ws.roomId){
+          //Iterate through the sockets in the room
+          room.sockets.forEach( (socketInRoomId) => {
+            //Iterate through all sockets
+            //@ts-ignore
+            server.clients.forEach( (socket: ExtWebSocket) => {
+              //Check if the socket is in the room, is open and is not the sender itself
+              if(socket.id == socketInRoomId && socket.readyState === WebSocket.OPEN && socket !== ws){
+                let dataToBeSent: Data = {event: "pause", payload: data.payload}
+                socket.send(JSON.stringify(dataToBeSent))
+              }
+            })
+          })
+        }
+      })
     }
     else if(data.event == "play"){
-      console.log("PLAY")
+      server.rooms.forEach( (room) => {
+        //Search for the room which the socket is in
+        if(room.id == ws.roomId){
+          //Iterate through the sockets in the room
+          room.sockets.forEach( (socketInRoomId) => {
+            //Iterate through all sockets
+            //@ts-ignore
+            server.clients.forEach( (socket: ExtWebSocket) => {
+              //Check if the socket is in the room, is open and is not the sender itself
+              if(socket.id == socketInRoomId && socket.readyState === WebSocket.OPEN && socket !== ws){
+                let dataToBeSent: Data = {event: "play" }
+                socket.send(JSON.stringify(dataToBeSent))
+              }
+            })
+          })
+        }
+      })
     }
   })
 
