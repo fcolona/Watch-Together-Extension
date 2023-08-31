@@ -31,6 +31,7 @@ server.rooms = []
 server.on('connection', (ws: ExtWebSocket) => {
   let socketId = uuidv4()
   ws.id = socketId
+  console.log(`New client connected: ${ws.id}`)
 
   ws.on('message', (dataStr) => {
     //@ts-ignore
@@ -49,7 +50,6 @@ server.on('connection', (ws: ExtWebSocket) => {
       server.rooms.push(room)
 
       //Log
-      console.log(`New client connected: ${ws.id}`)
       console.log(`New room created: ${roomId}`)
 
       //Send room id back to client
@@ -64,7 +64,7 @@ server.on('connection', (ws: ExtWebSocket) => {
           room.sockets.push(ws.id)
           //Add roomId to socket
           ws.roomId = room.id
-          console.log(`New client connected: ${ws.id}`)
+          console.log(`New client connected to the room`)
         }
       })
     }
