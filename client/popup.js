@@ -67,7 +67,7 @@ function createRoom() {
   chrome.runtime.sendMessage({ action: "createRoom" })
 }
 
-//Renders the html form to enter the desired room id to enter
+//Renders the html form to input the desired room id to enter
 function renderEnterRoom() {
   var child = container.lastElementChild;
   while (child) {

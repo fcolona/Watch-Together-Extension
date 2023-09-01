@@ -1,5 +1,6 @@
 import WebSocket, { WebSocketServer } from 'ws';
 import { v4 as uuidv4 } from 'uuid'
+import ShortUniqueId from 'short-unique-id';
 
 interface Data {
   event: string
@@ -39,7 +40,7 @@ server.on('connection', (ws: ExtWebSocket) => {
 
     if (data.event == "createRoom") {
       //Create room
-      let roomId = uuidv4()
+      let roomId = new ShortUniqueId({ length: 10 })()
       const room = new Room(roomId)
 
       //Add socket to room
