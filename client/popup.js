@@ -12,12 +12,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action == "roomNotFound") {
     updateState("Room not found!")
   }
+  if (request.action == "disconnected") {
+    updateState()
+  }
 })
 
 //Updates the popup according to the state of the browser
 function updateState(error = "") {
-  console.log(`Error: ${error}`)
   chrome.runtime.sendMessage({ action: "checkState" }, response => {
+    console.log(response)
     //If there is an error message, display it
     if (error !== "") {
       const errorSpan = document.createElement("span")
@@ -34,20 +37,29 @@ function updateState(error = "") {
     }
     //If the connection is open and the socket is connected to a room
     else if (response.isConnectionOpen && response.roomId !== "") {
-      //Remove all elements inside container
-      let child = container.lastElementChild;
-      while (child) {
-        container.removeChild(child);
-        child = container.lastElementChild;
-      }
+      //Make every element inside the container display none
+      Array.from(container.children).forEach( child => {
+        child.style.display = "none"
+      })
+
       const roomIdSpan = document.createElement("span")
       roomIdSpan.textContent = `Room Code: ${response.roomId}`
       container.appendChild(roomIdSpan)
+      
+      const disconnectBtn = document.createElement("button")
+      disconnectBtn.textContent = "Disconnect"
+      disconnectBtn.addEventListener("click", () => chrome.runtime.sendMessage({ action: "disconnect" }))
+      container.appendChild(disconnectBtn)
     }
     //Default state
     //Neither the connection is open nor the socket is in a room
     else {
-      startBtn.style.display = "inline"
+      //Make every element inside the container display none
+      Array.from(container.children).forEach( child => {
+        child.style.display = "none"
+      })
+
+      startBtn.style.display = "inline" 
       startBtn.addEventListener("click", () => {
         chrome.runtime.sendMessage({ action: "connect" })
 

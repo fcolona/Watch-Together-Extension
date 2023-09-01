@@ -56,4 +56,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action == "play") {
         ws.send(JSON.stringify({ event: request.action, payload: request.payload }))
     }
+    if (request.action == "disconnect") {
+        //Set global variables back to default
+        isConnectionOpen = false
+        roomId = ""
+
+        //Close connection
+        ws.close()
+
+        //Send message to update popup
+        chrome.runtime.sendMessage({ action: "disconnected" })
+    }
 })
