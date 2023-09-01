@@ -57,6 +57,7 @@ server.on('connection', (ws: ExtWebSocket) => {
       ws.send(dataToBeSent)
     }
     else if (data.event == "enterRoom") {
+      let didEnterRoom = false
       server.rooms.forEach((room) => {
         //Search for the room with given id
         if (room.id == data.payload) {
@@ -64,9 +65,16 @@ server.on('connection', (ws: ExtWebSocket) => {
           room.sockets.push(ws.id)
           //Add roomId to socket
           ws.roomId = room.id
+
           console.log(`New client connected to the room`)
+          didEnterRoom = true
+          
+          ws.send(JSON.stringify({ event: "roomId", payload: ws.roomId }))
         }
       })
+      if(didEnterRoom == false){
+        ws.send(JSON.stringify({ event: "roomNotFound" }))
+      }
     }
     //PAYLOAD HERE IS THE CURRENT VIDEO TIME
     else if (data.event == "pause") {

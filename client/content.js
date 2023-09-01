@@ -12,7 +12,6 @@ function handleEvent(event) {
         chrome.runtime.sendMessage({ action: "play", payload: video.currentTime })
     }
     else if (event.type == "onseeking") {
-        console.log("JUMP")
         if (Math.round(lastSyncedTime) !== Math.round(video.currentTime) && video.paused == true) {
             lastSyncedTime = video.currentTime
             chrome.runtime.sendMessage({ action: "syncTime", payload: video.currentTime })
