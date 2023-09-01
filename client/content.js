@@ -1,5 +1,25 @@
 const video = document.querySelector("video")
 
+let lastSyncedTime = 0.0
+function handleEvent(event) {
+    if (event.type == "pause") {
+        if (Math.round(lastSyncedTime) !== Math.round(video.currentTime) && video.seeking == false) {
+            lastSyncedTime = video.currentTime
+            chrome.runtime.sendMessage({ action: "pause", payload: video.currentTime })
+        }
+    }
+    else if (event.type == "play") {
+        chrome.runtime.sendMessage({ action: "play", payload: video.currentTime })
+    }
+    else if (event.type == "onseeking") {
+        console.log("JUMP")
+        if (Math.round(lastSyncedTime) !== Math.round(video.currentTime) && video.paused == true) {
+            lastSyncedTime = video.currentTime
+            chrome.runtime.sendMessage({ action: "syncTime", payload: video.currentTime })
+        }
+    }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action == "pause") {
         video.pause()
@@ -13,26 +33,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         video.currentTime = request.payload
     }
 })
-
-let lastSyncedTime = 0.0
-function handleEvent(event){
-    if(event.type == "pause"){
-        if(Math.round(lastSyncedTime) !== Math.round(video.currentTime) && video.seeking == false){
-            lastSyncedTime = video.currentTime
-            chrome.runtime.sendMessage({ action: "pause", payload: video.currentTime })
-        }
-    }
-    else if(event.type == "play"){
-        chrome.runtime.sendMessage({ action: "play", payload: video.currentTime })
-    }
-    else if(event.type == "onseeking"){
-        if(Math.round(lastSyncedTime) !== Math.round(video.currentTime) && video.paused == true){
-            lastSyncedTime = video.currentTime
-            chrome.runtime.sendMessage({ action: "syncTime", payload: video.currentTime })
-        }
-    }
-}
-
 
 video.addEventListener("play", handleEvent)
 video.addEventListener("pause", handleEvent)
