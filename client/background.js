@@ -4,7 +4,7 @@ let ws
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action == "checkState") {
-        sendResponse({ isConnectionOpen, roomId})
+        sendResponse({ isConnectionOpen, roomId })
     }
     if (request.action == "connect") {
         //Setup WebSocket
@@ -19,6 +19,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 let data = JSON.parse(event.data)
                 console.log(data.event)
 
+                if (data.event == "connected") {
+                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                        chrome.tabs.sendMessage(tabs[0].id, { action: "connected" });
+                    })
+                }
                 if (data.event == "roomId") {
                     roomId = data.payload
                     chrome.runtime.sendMessage({ action: "roomId", payload: roomId })

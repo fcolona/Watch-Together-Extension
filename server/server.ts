@@ -32,6 +32,7 @@ server.rooms = []
 server.on('connection', (ws: ExtWebSocket) => {
   let socketId = uuidv4()
   ws.id = socketId
+  ws.send(JSON.stringify({ event: "connected" }))
   console.log(`New client connected: ${ws.id}`)
 
   ws.on('message', (dataStr) => {
