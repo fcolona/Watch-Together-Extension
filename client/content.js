@@ -20,7 +20,7 @@ function handleEvent(event) {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action == "connected") {
+    if (request.action == "connected" && video !== null) {
         video.addEventListener("play", handleEvent)
         video.addEventListener("pause", handleEvent)
         video.addEventListener("onseeking", handleEvent)
@@ -40,8 +40,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 
 chrome.runtime.sendMessage({ action: "checkState" }, response => {
-    console.log(response)
-    if (response.isConnectionOpen) {
+    if (response.isConnectionOpen && video !== null) {
         video.addEventListener("play", handleEvent)
         video.addEventListener("pause", handleEvent)
         video.addEventListener("onseeking", handleEvent)
