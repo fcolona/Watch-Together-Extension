@@ -2,3 +2,4 @@ node_modules
 js
 server/yarn-error.log
 server/yarn.lock
+bootstrap

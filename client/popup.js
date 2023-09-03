@@ -29,6 +29,7 @@ function updateState(error = "") {
     }
     //If the connection is open and the socket is not connected to a room
     if (response.isConnectionOpen && response.roomId == "") {
+      startBtn.style.display = "none"
       createRoomBtn.style.display = "inline"
       enterRoomBtn.style.display = "inline"
 
@@ -43,10 +44,16 @@ function updateState(error = "") {
       })
 
       const roomIdSpan = document.createElement("span")
-      roomIdSpan.textContent = `Room Code: ${response.roomId}`
+      roomIdSpan.id = "roomIdSpan"
+      roomIdSpan.textContent = `${response.roomId}`
       container.appendChild(roomIdSpan)
       
+      const br = document.createElement("br")
+      container.appendChild(br)
+      
       const disconnectBtn = document.createElement("button")
+      disconnectBtn.id = "disconnectBtn"
+      disconnectBtn.className = "btn btn-danger"
       disconnectBtn.textContent = "Disconnect"
       disconnectBtn.addEventListener("click", () => chrome.runtime.sendMessage({ action: "disconnect" }))
       container.appendChild(disconnectBtn)
@@ -86,18 +93,18 @@ function renderEnterRoom() {
     container.removeChild(child);
     child = container.lastElementChild;
   }
-
-  const span = document.createElement("span")
-  span.id = "roomCodeSpan"
-  span.textContent = "Room Code: "
+  
   const roomCodeInput = document.createElement("input")
+  roomCodeInput.placeholder = "Enter room code..."
   roomCodeInput.id = "roomIdInput"
+  roomCodeInput.className = "form-control bg-dark text-white"
+
   const button = document.createElement("button")
   button.id = "submitEnterBtn"
+  button.className = "btn btn-primary"
   button.textContent = "Enter"
   button.addEventListener("click", enterRoom)
 
-  container.appendChild(span)
   container.appendChild(roomCodeInput)
   container.appendChild(button)
 }

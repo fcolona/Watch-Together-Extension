@@ -1,0 +1,40 @@
+$primary: rebeccapurple;
+$secondary: #77216F;
+@import "bootstrap/scss/bootstrap";
+
+html
+{
+    //Reset    
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+
+    width: 276px;
+    height: 376px;
+    border: 1px solid whitesmoke;
+}
+body {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    padding-top: 15%;
+    flex-direction: row;
+    justify-content: center;
+    background-color: #212121;
+    color: white;
+    border-bottom: 2px solid whitesmoke;
+}
+#roomIdSpan{
+    border-bottom: 2px solid whitesmoke;
+    padding: 5px
+}
+#disconnectBtn{
+    margin-top: 20px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+#roomIdInput::placeholder{
+    color: whitesmoke;
+}
