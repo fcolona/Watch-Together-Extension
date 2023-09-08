@@ -23,9 +23,20 @@ function updateState(error = "") {
     console.log(response)
     //If there is an error message, display it
     if (error !== "") {
+      const otherAlerts = document.getElementsByClassName("alert alert-danger")
+      //Checks if there is already an alert and remove it
+      if (otherAlerts.length != 0) {
+        otherAlerts.item(0).remove()
+      }
       const errorSpan = document.createElement("span")
       errorSpan.textContent = error
+      errorSpan.className = "alert alert-danger"
+      errorSpan.setAttribute("role", "alert")
       container.prepend(errorSpan)
+
+      setTimeout(() => {
+        errorSpan.remove()
+      }, 2000)
     }
     //If the connection is open and the socket is not connected to a room
     if (response.isConnectionOpen && response.roomId == "") {
@@ -39,7 +50,7 @@ function updateState(error = "") {
     //If the connection is open and the socket is connected to a room
     else if (response.isConnectionOpen && response.roomId !== "") {
       //Make every element inside the container display none
-      Array.from(container.children).forEach( child => {
+      Array.from(container.children).forEach(child => {
         child.style.display = "none"
       })
 
@@ -47,10 +58,10 @@ function updateState(error = "") {
       roomIdSpan.id = "roomIdSpan"
       roomIdSpan.textContent = `${response.roomId}`
       container.appendChild(roomIdSpan)
-      
+
       const br = document.createElement("br")
       container.appendChild(br)
-      
+
       const disconnectBtn = document.createElement("button")
       disconnectBtn.id = "disconnectBtn"
       disconnectBtn.className = "btn btn-danger"
@@ -62,11 +73,11 @@ function updateState(error = "") {
     //Neither the connection is open nor the socket is in a room
     else {
       //Make every element inside the container display none
-      Array.from(container.children).forEach( child => {
+      Array.from(container.children).forEach(child => {
         child.style.display = "none"
       })
 
-      startBtn.style.display = "inline" 
+      startBtn.style.display = "inline"
       startBtn.addEventListener("click", () => {
         chrome.runtime.sendMessage({ action: "connect" })
 
@@ -93,7 +104,7 @@ function renderEnterRoom() {
     container.removeChild(child);
     child = container.lastElementChild;
   }
-  
+
   const roomCodeInput = document.createElement("input")
   roomCodeInput.placeholder = "Enter room code..."
   roomCodeInput.id = "roomIdInput"

@@ -12005,6 +12005,10 @@ body {
   padding-right: 5px;
 }
 
+#roomIdInput {
+  margin-top: 25px;
+}
+
 #roomIdInput::-moz-placeholder {
   color: whitesmoke;
 }
