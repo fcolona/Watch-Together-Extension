@@ -3,3 +3,4 @@ js
 server/yarn-error.log
 server/yarn.lock
 bootstrap
+popup.css.map
