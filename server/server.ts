@@ -122,7 +122,7 @@ wss.on('connection', (ws: ExtWebSocket) => {
         }
       })
       if (socketsUrls.length !== 0) {
-        let dataToBeSent = JSON.stringify({ event: "sus", payload: socketsUrls })
+        let dataToBeSent = JSON.stringify({ event: "socketsInRoom", payload: socketsUrls })
         ws.send(dataToBeSent)
       }
     }

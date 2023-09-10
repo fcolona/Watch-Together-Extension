@@ -24,6 +24,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         video.addEventListener("play", handleEvent)
         video.addEventListener("pause", handleEvent)
         video.addEventListener("onseeking", handleEvent)
+
+        chrome.runtime.sendMessage({ action: "updateUrl", payload: window.location.href })
     }
     if (request.action == "pause") {
         video.pause()

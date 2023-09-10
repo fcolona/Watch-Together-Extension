@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action == "connect") {
         //Setup WebSocket
-        ws = new WebSocket("ws://watchtogether.tech:8080")
+        ws = new WebSocket("ws://localhost:8080")
 
         //Open connection
         ws.onopen = (event) => {
@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (data.event == "roomNotFound") {
                     chrome.runtime.sendMessage({ action: "roomNotFound" })
                 }
-                if (data.event == "sus") {
+                if (data.event == "socketsInRoom") {
                     chrome.runtime.sendMessage({ action: "socketsInRoom", payload: data.payload })
                 }
                 if (data.event == "pause") {
@@ -61,6 +61,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         ws.send(JSON.stringify({ event: request.action, payload: request.payload }))
     }
     if (request.action == "updateUrl") {
+        console.log(request.payload)
         ws.send(JSON.stringify({ event: request.action, payload: request.payload }))
     }
     if (request.action == "getSocketsInRoom") {
