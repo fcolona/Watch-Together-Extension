@@ -14,6 +14,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         ws.onopen = (event) => {
             isConnectionOpen = true
 
+            ws.send(JSON.stringify({ event: "registerName", payload: request.payload }))
+
             //Listen to messages from the server through WebSocket
             ws.addEventListener("message", (event) => {
                 let data = JSON.parse(event.data)
@@ -30,6 +32,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 }
                 if (data.event == "roomNotFound") {
                     chrome.runtime.sendMessage({ action: "roomNotFound" })
+                }
+                if (data.event == "sus") {
+                    chrome.runtime.sendMessage({ action: "socketsInRoom", payload: data.payload })
                 }
                 if (data.event == "pause") {
                     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -54,6 +59,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action == "enterRoom") {
         ws.send(JSON.stringify({ event: request.action, payload: request.payload }))
+    }
+    if (request.action == "updateUrl") {
+        ws.send(JSON.stringify({ event: request.action, payload: request.payload }))
+    }
+    if (request.action == "getSocketsInRoom") {
+        ws.send(JSON.stringify({ event: request.action }))
     }
     if (request.action == "pause") {
         ws.send(JSON.stringify({ event: request.action, payload: request.payload }))

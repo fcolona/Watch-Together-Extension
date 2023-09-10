@@ -11984,6 +11984,8 @@ html {
 
 body {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   height: 100%;
   width: 100%;
   padding-top: 15%;
@@ -11999,14 +12001,28 @@ body {
   padding: 5px;
 }
 
+#nameInput::-moz-placeholder {
+  color: whitesmoke;
+}
+
+#nameInput::placeholder {
+  color: whitesmoke;
+}
+
+.socketsInRoom {
+  position: absolute;
+  left: 5%;
+  margin-top: 25px;
+}
+
+.links {
+  color: #AFD2E9;
+}
+
 #disconnectBtn {
   margin-top: 20px;
   padding-left: 5px;
   padding-right: 5px;
-}
-
-#roomIdInput {
-  margin-top: 25px;
 }
 
 #roomIdInput::-moz-placeholder {

@@ -2,6 +2,7 @@ const container = document.getElementById("container")
 const createRoomBtn = document.getElementById("createRoomBtn")
 const enterRoomBtn = document.getElementById("enterRoomBtn")
 const startBtn = document.getElementById("startBtn")
+const nameInput = document.getElementById("nameInput")
 
 //Listen to messages from the background script
 //in order to update the popup
@@ -9,6 +10,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action == "roomId") {
     updateState()
   }
+  if (request.action == "socketsInRoom") {
+    let i = 0
+    request.payload.forEach((socket) => {
+      const nameSpan = document.createElement("span")
+      nameSpan.className = "socketsInRoom"
+
+      const br = document.createElement("br")
+      container.append(br)
+
+      if (socket.currentUrl !== undefined) {
+        nameSpan.innerHTML = `${socket.name} is watching: <a href="${socket.currentUrl}" class="links" id="link${i}">link</a>`
+        container.append(nameSpan)
+
+        document.getElementById(`link${i}`).addEventListener("click", (event) => {
+          let targetElement = event.target || event.srcElement;
+          chrome.tabs.create({ url: targetElement.href });
+          return false;
+        })
+      } else {
+        nameSpan.textContent = `${socket.name}`
+        container.append(nameSpan)
+      }
+      i++
+    })
+  }
+
   if (request.action == "roomNotFound") {
     updateState("Room not found!")
   }
@@ -40,6 +67,7 @@ function updateState(error = "") {
     }
     //If the connection is open and the socket is not connected to a room
     if (response.isConnectionOpen && response.roomId == "") {
+      nameInput.style.display = "none"
       startBtn.style.display = "none"
       createRoomBtn.style.display = "inline"
       enterRoomBtn.style.display = "inline"
@@ -62,6 +90,8 @@ function updateState(error = "") {
       const br = document.createElement("br")
       container.appendChild(br)
 
+      chrome.runtime.sendMessage({ action: "getSocketsInRoom" })
+
       const disconnectBtn = document.createElement("button")
       disconnectBtn.id = "disconnectBtn"
       disconnectBtn.className = "btn btn-danger"
@@ -77,10 +107,16 @@ function updateState(error = "") {
         child.style.display = "none"
       })
 
-      startBtn.style.display = "inline"
-      startBtn.addEventListener("click", () => {
-        chrome.runtime.sendMessage({ action: "connect" })
+      nameInput.style.display = "block"
+      startBtn.style.display = "block"
 
+      startBtn.addEventListener("click", () => {
+        if (nameInput.value == "") {
+          return false
+        }
+        chrome.runtime.sendMessage({ action: "connect", payload: nameInput.value })
+
+        nameInput.style.display = "none"
         startBtn.style.display = "none"
         createRoomBtn.style.display = "inline"
         enterRoomBtn.style.display = "inline"

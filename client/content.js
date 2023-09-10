@@ -44,5 +44,7 @@ chrome.runtime.sendMessage({ action: "checkState" }, response => {
         video.addEventListener("play", handleEvent)
         video.addEventListener("pause", handleEvent)
         video.addEventListener("onseeking", handleEvent)
+        
+        chrome.runtime.sendMessage({ action: "updateUrl", payload: window.location.href })
     }
 })

@@ -19,13 +19,21 @@ class Room {
   }
 }
 
+interface SocketNameAndUrl {
+  name: string
+  currentUrl: string
+}
+interface SocketsNameAndUrlArray extends Array<SocketNameAndUrl> { }
+
 declare class ExtWebSocketServer extends WebSocketServer {
   rooms: Room[]
 }
 
 declare interface ExtWebSocket extends WebSocket {
   id: string
+  name: string
   roomId: string
+  currentUrl: string
 }
 
 //Initialize HTTP server
@@ -34,7 +42,7 @@ const httpServer = http.createServer(app);
 
 //Initialize Websocket server
 //@ts-ignore
-const wss: ExtWebSocketServer = new WebSocket.Server({server: httpServer});
+const wss: ExtWebSocketServer = new WebSocket.Server({ server: httpServer });
 wss.rooms = []
 
 wss.on('connection', (ws: ExtWebSocket) => {
@@ -47,7 +55,11 @@ wss.on('connection', (ws: ExtWebSocket) => {
     //@ts-ignore
     let data: Data = JSON.parse(dataStr)
 
-    if (data.event == "createRoom") {
+    if (data.event == "registerName") {
+      //@ts-ignore
+      ws.name = data.payload
+    }
+    else if (data.event == "createRoom") {
       //Create room
       let roomId = new ShortUniqueId({ length: 10 })()
       const room = new Room(roomId)
@@ -78,12 +90,40 @@ wss.on('connection', (ws: ExtWebSocket) => {
 
           console.log(`New client connected to the room`)
           didEnterRoom = true
-          
+
           ws.send(JSON.stringify({ event: "roomId", payload: ws.roomId }))
         }
       })
-      if(didEnterRoom == false){
+      if (didEnterRoom == false) {
         ws.send(JSON.stringify({ event: "roomNotFound" }))
+      }
+    }
+    else if (data.event == "updateUrl") {
+      //@ts-ignore
+      ws.currentUrl = data.payload
+    }
+    else if (data.event == "getSocketsInRoom") {
+      let socketsUrls: SocketsNameAndUrlArray = []
+      wss.rooms.forEach((room) => {
+        //Search for the room which the socket is in
+        if (room.id == ws.roomId) {
+          //Iterate through the sockets in the room
+          room.sockets.forEach((socketInRoomId) => {
+            //Iterate through all sockets
+            //@ts-ignore
+            wss.clients.forEach((socket: ExtWebSocket) => {
+              //Check if the socket is in the room, is open and is not the sender itself
+              //console.log(`A: ${socket.name} / B: ${ws.name}`)
+              if (socket.id == socketInRoomId && socket.readyState === WebSocket.OPEN && socket.id !== ws.id) {
+                socketsUrls.push({ name: socket.name, currentUrl: socket.currentUrl })
+              }
+            })
+          })
+        }
+      })
+      if (socketsUrls.length !== 0) {
+        let dataToBeSent = JSON.stringify({ event: "sus", payload: socketsUrls })
+        ws.send(dataToBeSent)
       }
     }
     //PAYLOAD HERE IS THE CURRENT VIDEO TIME
@@ -157,14 +197,14 @@ wss.on('connection', (ws: ExtWebSocket) => {
       if (room.id == ws.roomId) {
 
         let j = 0
-        room.sockets.forEach( socketInRoomId=> {
+        room.sockets.forEach(socketInRoomId => {
           //Remove the socket that is exiting
-          if(socketInRoomId == ws.id){
+          if (socketInRoomId == ws.id) {
             room.sockets.splice(j, 1)
 
             //If the room is empty, remove it
-            if(room.sockets.length == 0){
-              wss.rooms.splice(i, 1)   
+            if (room.sockets.length == 0) {
+              wss.rooms.splice(i, 1)
             }
           }
           j++
@@ -182,5 +222,5 @@ app.get("/", (req: Request, res: Response) => {
 
 //Start our server
 httpServer.listen(8080, () => {
-    console.log(`Server started on port 8080`);
+  console.log(`Server started on port 8080`);
 });
