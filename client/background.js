@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action == "connect") {
         //Setup WebSocket
-        ws = new WebSocket("ws://localhost:8080")
+        ws = new WebSocket("ws://watchtogether.tech:8080")
 
         //Open connection
         ws.onopen = (event) => {
@@ -85,3 +85,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.runtime.sendMessage({ action: "disconnected" })
     }
 })
+
+chrome.tabs.onActivated.addListener((activeInfo) => {
+    //If the connection is open and it is in a room
+    //Run content script in order to add event listeners and update video url
+    if (isConnectionOpen && roomId !== "") {
+        chrome.tabs.executeScript(activeInfo.tabId, {
+            code: "var addListeners = true;"
+        }, () => {
+            chrome.tabs.executeScript(activeInfo.tabId, { file: "content.js" });
+        });
+    }
+});

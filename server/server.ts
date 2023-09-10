@@ -113,7 +113,6 @@ wss.on('connection', (ws: ExtWebSocket) => {
             //@ts-ignore
             wss.clients.forEach((socket: ExtWebSocket) => {
               //Check if the socket is in the room, is open and is not the sender itself
-              //console.log(`A: ${socket.name} / B: ${ws.name}`)
               if (socket.id == socketInRoomId && socket.readyState === WebSocket.OPEN && socket.id !== ws.id) {
                 socketsUrls.push({ name: socket.name, currentUrl: socket.currentUrl })
               }

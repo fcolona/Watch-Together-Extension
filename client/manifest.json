@@ -9,7 +9,12 @@
     	"128": "icon128.png"
     },
     "permissions": [
-      "activeTab"
+      "background",
+      "tabs",
+      "activeTab",
+      "scripting",
+      "http://*/",
+      "https://*/"
     ],
     "content_scripts": [
       {
