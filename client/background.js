@@ -93,7 +93,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
         chrome.tabs.executeScript(activeInfo.tabId, {
             code: "var addListeners = true;"
         }, () => {
-            chrome.tabs.executeScript(activeInfo.tabId, { file: "content.js" });
+            chrome.tabs.executeScript(activeInfo.tabId, { file: "content.js", allFrames : true });
         });
     }
 });
