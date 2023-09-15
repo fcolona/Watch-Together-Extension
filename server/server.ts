@@ -2,6 +2,7 @@ import WebSocket, { WebSocketServer } from 'ws';
 import { v4 as uuidv4 } from 'uuid'
 import ShortUniqueId from 'short-unique-id';
 import express from 'express'
+import path from 'path'
 import * as http from 'http';
 import { Request, Response } from 'express';
 
@@ -217,6 +218,10 @@ wss.on('connection', (ws: ExtWebSocket) => {
 //Test route
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!")
+})
+
+app.get("/privacy-policy", (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '/static/privacy-policy.html'));
 })
 
 //Start our server
