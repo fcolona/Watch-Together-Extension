@@ -2,6 +2,14 @@ let isConnectionOpen = false
 let roomId = ""
 let ws
 
+chrome.runtime.onInstalled.addListener( (object) => {
+    let internalUrl = chrome.runtime.getURL("views/help.html")
+
+    if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+        chrome.tabs.create({ url: internalUrl });
+    }
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action == "checkState") {
         sendResponse({ isConnectionOpen, roomId })
