@@ -1,6 +1,6 @@
 {
     "name": "Watch Together",
-    "description": "Watch any video content on the web, in real time with your friends",    
+    "description": "Watch any video content on the web in real time with your friends",    
     "version": "0.1",
     "manifest_version": 2,
     "icons": {
