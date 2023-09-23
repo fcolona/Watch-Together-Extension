@@ -2,7 +2,7 @@ let isConnectionOpen = false
 let roomId = ""
 let ws
 
-chrome.runtime.onInstalled.addListener( (object) => {
+chrome.runtime.onInstalled.addListener((object) => {
     let internalUrl = chrome.runtime.getURL("views/help.html")
 
     if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
@@ -98,10 +98,12 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     //If the connection is open and it is in a room
     //Run content script in order to add event listeners and update video url
     if (isConnectionOpen && roomId !== "") {
-        chrome.tabs.executeScript(activeInfo.tabId, {
-            code: "var addListeners = true;"
+        chrome.scripting.executeScript({
+            target: { tabId: activeInfo.tabId },
+            args: [{ addListeners: true }],
+            func: vars => Object.assign(self, vars),
         }, () => {
-            chrome.tabs.executeScript(activeInfo.tabId, { file: "content.js", allFrames : true });
+            chrome.scripting.executeScript({ target: { tabId: activeInfo.tabId }, files: ['content.js'] });
         });
     }
 });

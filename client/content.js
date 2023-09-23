@@ -37,8 +37,8 @@ function handleEvent(event) {
 
 //addListeners comes as true when changing tabs
 //And comes as undefined, when not 
-if (typeof addListeners !== "undefined") {
-    if (addListeners == true && typeof window.video == "undefined") {
+if (typeof window.addListeners !== "undefined") {
+    if (window.addListeners == true && typeof window.video == "undefined") {
         let video = getVideoElement()
         window.video = video
         if (video !== null) {
