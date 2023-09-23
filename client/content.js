@@ -1,10 +1,10 @@
 //Searches for a video element and
 //Returns the first video it finds or undefined
 function getVideoElement() {
-    let videoFound = document.getElementsByTagName("video")[0]
+    let videoFound = document.getElementsByTagName("video").item(0)
 
     //Checks if the video was not already found 
-    if (typeof video === "undefined") {
+    if (typeof window.video === "undefined" || videoFound == null) {
         window.lastSyncedTime = 0.0
     } else {
         window.lastSyncedTime = videoFound.currentTime
@@ -12,25 +12,9 @@ function getVideoElement() {
 
     return videoFound
 }
-window.video = getVideoElement()
 
-function addEventListeners(video) {
-    if (typeof video !== "undefined") {
-        video.addEventListener("play", handleEvent)
-        video.addEventListener("pause", handleEvent)
-        video.addEventListener("onseeking", handleEvent)
-        video.setAttribute("hasListeners", "true")
-    }
-}
-
-//addListeners comes as true when changing tabs
-//And comes as not defined, when not 
-if (typeof addListeners !== "undefined") {
-    if (addListeners == true && typeof window.video !== "undefined" && window.video.getAttribute("hasListeners") !== "true") {
-        addEventListeners(window.video)
-    }
-}
-
+//Handle events related to the user interaction with the video element
+//Sends a message to the server
 function handleEvent(event) {
     if (event.type == "pause") {
         console.log("PAUSE")
@@ -51,43 +35,62 @@ function handleEvent(event) {
     }
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action == "connected" && window.video !== null && typeof video !== "undefined" && window.video.getAttribute("hasListeners") !== "true") {
+//addListeners comes as true when changing tabs
+//And comes as undefined, when not 
+if (typeof addListeners !== "undefined") {
+    if (addListeners == true && typeof window.video == "undefined") {
         let video = getVideoElement()
         window.video = video
-
-        window.video.addEventListener("play", handleEvent)
-        window.video.addEventListener("pause", handleEvent)
-        window.video.addEventListener("onseeking", handleEvent)
-        window.video.setAttribute("hasListeners", "true")
-
-        chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
+        if (video !== null) {
+            window.video.addEventListener("play", handleEvent)
+            window.video.addEventListener("pause", handleEvent)
+            window.video.addEventListener("onseeking", handleEvent)
+            window.video.setAttribute("hasListeners", "true")
+        }
     }
-    if (request.action == "pause") {
-        window.video.pause()
-        window.video.currentTime = request.payload
-    }
-    if (request.action == "play") {
-        window.video.play()
-        window.video.currentTime = request.payload
-    }
-    if (request.action == "syncTime") {
-        window.video.currentTime = request.payload
-    }
-})
+}
+
+window.onload = () => {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.action == "connected" && typeof window.video == "undefined") {
+            let video = getVideoElement()
+            if (video !== null) {
+                window.video = video
+
+                window.video.addEventListener("play", handleEvent)
+                window.video.addEventListener("pause", handleEvent)
+                window.video.addEventListener("onseeking", handleEvent)
+                window.video.setAttribute("hasListeners", "true")
+
+                chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
+            }
+        }
+        if (request.action == "pause") {
+            window.video.pause()
+            window.video.currentTime = request.payload
+        }
+        if (request.action == "play") {
+            window.video.play()
+            window.video.currentTime = request.payload
+        }
+        if (request.action == "syncTime") {
+            window.video.currentTime = request.payload
+        }
+    })
 
 
-chrome.runtime.sendMessage({ action: "checkState" }, response => {
-    if (response.isConnectionOpen && window.video !== null && typeof video !== "undefined" && window.video.getAttribute("hasListeners") == "true") {
-        console.log("AAAAAAA")
-        let video = getVideoElement()
-        window.video = video
+    chrome.runtime.sendMessage({ action: "checkState" }, response => {
+        if (response.isConnectionOpen && response.roomId !== "") {
+            let video = getVideoElement()
+            if (video !== null && typeof window.video == "undefined") {
+                window.video = video
 
-        window.video.addEventListener("play", handleEvent)
-        window.video.addEventListener("pause", handleEvent)
-        window.video.addEventListener("onseeking", handleEvent)
-        window.video.setAttribute("hasListeners", "true")
-
-        chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
-    }
-})
+                window.video.addEventListener("play", handleEvent)
+                window.video.addEventListener("pause", handleEvent)
+                window.video.addEventListener("onseeking", handleEvent)
+                window.video.setAttribute("hasListeners", "true")
+                chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
+            }
+        }
+    })
+}
