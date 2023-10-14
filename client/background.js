@@ -2,6 +2,20 @@ let isConnectionOpen = false
 let roomId = ""
 let ws
 
+function keepAlive() {
+  const keepAliveIntervalId = setInterval(
+    () => {
+      if (ws) {
+        ws.send(JSON.stringify({ event: "keepalive" }));
+      } else {
+        clearInterval(keepAliveIntervalId);
+      }
+    },
+    // Set the interval to 20 seconds to prevent the service worker from becoming inactiv
+    20 * 1000 
+  );
+}
+
 chrome.runtime.onInstalled.addListener((object) => {
     let internalUrl = chrome.runtime.getURL("views/help.html")
 
@@ -23,6 +37,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             isConnectionOpen = true
 
             ws.send(JSON.stringify({ event: "registerName", payload: request.payload }))
+            
+            keepAlive()
 
             //Listen to messages from the server through WebSocket
             ws.addEventListener("message", (event) => {

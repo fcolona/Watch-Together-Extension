@@ -55,6 +55,11 @@ wss.on('connection', (ws: ExtWebSocket) => {
   ws.on('message', (dataStr) => {
     //@ts-ignore
     let data: Data = JSON.parse(dataStr)
+    
+    
+    if (data.event == "keepalive") {
+      console.log("Keepalive")
+    }
 
     if (data.event == "registerName") {
       //@ts-ignore
