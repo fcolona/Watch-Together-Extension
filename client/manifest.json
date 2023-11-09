@@ -1,7 +1,7 @@
 {
-    "name": "Watch Together",
+    "name": "Watch Together: Animes, Videos, Movies and more!",
     "description": "Watch any video content on the web in real time with your friends",    
-    "version": "0.1",
+    "version": "0.3",
     "manifest_version": 3,
     "icons": {
     	"16": "assets/icon16.png",

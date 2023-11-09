@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action == "connect") {
         //Setup WebSocket
-        ws = new WebSocket("ws://watchtogether.tech:8080")
+        ws = new WebSocket("ws://watchtogether.tech")
 
         //Open connection
         ws.onopen = (event) => {

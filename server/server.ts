@@ -222,14 +222,14 @@ wss.on('connection', (ws: ExtWebSocket) => {
 
 //Test route
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!")
+  res.redirect("https://chromewebstore.google.com/u/1/detail/hgajioephkekkkhkjofjpgggeflpeccl")
 })
 
 app.get("/privacy-policy", (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '/static/privacy-policy.html'));
+  res.sendFile(path.join(__dirname, '../static/privacy-policy.html'));
 })
 
 //Start our server
-httpServer.listen(8080, () => {
-  console.log(`Server started on port 8080`);
+httpServer.listen(3000, () => {
+  console.log(`Server started on port 3000`);
 });
