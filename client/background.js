@@ -2,18 +2,19 @@ let isConnectionOpen = false
 let roomId = ""
 let ws
 
+
 function keepAlive() {
-  const keepAliveIntervalId = setInterval(
-    () => {
-      if (ws) {
-        ws.send(JSON.stringify({ event: "keepalive" }));
-      } else {
-        clearInterval(keepAliveIntervalId);
-      }
-    },
-    // Set the interval to 20 seconds to prevent the service worker from becoming inactiv
-    20 * 1000 
-  );
+    const keepAliveIntervalId = setInterval(
+        () => {
+            if (isConnectionOpen) {
+                ws.send(JSON.stringify({ event: "keepalive" }));
+            } else {
+                clearInterval(keepAliveIntervalId);
+            }
+        },
+        // Set the interval to 20 seconds to prevent the service worker from becoming inactiv
+        20 * 1000
+    );
 }
 
 chrome.runtime.onInstalled.addListener((object) => {
@@ -37,7 +38,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             isConnectionOpen = true
 
             ws.send(JSON.stringify({ event: "registerName", payload: request.payload }))
-            
+
             keepAlive()
 
             //Listen to messages from the server through WebSocket
@@ -108,7 +109,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         //Send message to update popup
         chrome.runtime.sendMessage({ action: "disconnected" })
     }
+
+    //Terminate WebSocket connection on browser closing
+    chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+        chrome.tabs.query({}, (tabs) => {
+            //Check if the tab closed was the last one
+            if (tabs.length === 0) {
+                //Set global variables back to default
+                isConnectionOpen = false
+                roomId = ""
+
+                //Close connection
+                ws.close()
+
+                //Send message to update popup
+                chrome.runtime.sendMessage({ action: "disconnected" })
+            }
+        })
+    })
 })
+
+
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
     //If the connection is open and it is in a room
@@ -123,3 +144,4 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
         });
     }
 });
+

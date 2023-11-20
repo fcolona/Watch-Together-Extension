@@ -1,5 +1,5 @@
 {
-    "name": "Watch Together: Animes, Videos, Movies and more!",
+    "name": "Watch Together: Animes, Videos, Movies and +",
     "description": "Watch any video content on the web in real time with your friends",    
     "version": "0.3",
     "manifest_version": 3,
@@ -10,7 +10,6 @@
     },
     "permissions": [
       "background",
-      "tabs",
       "activeTab",
       "scripting"
     ],

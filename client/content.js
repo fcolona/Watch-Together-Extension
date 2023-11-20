@@ -9,6 +9,7 @@ function getVideoElement() {
     } else {
         window.lastSyncedTime = videoFound.currentTime
     }
+    console.log(videoFound)
 
     return videoFound
 }
@@ -27,11 +28,10 @@ function handleEvent(event) {
         console.log("PLAY")
         chrome.runtime.sendMessage({ action: "play", payload: window.video.currentTime })
     }
-    else if (event.type == "onseeking") {
-        if (Math.round(window.lastSyncedTime) !== Math.round(window.video.currentTime) && window.video.paused == true) {
-            window.lastSyncedTime = window.video.currentTime
-            chrome.runtime.sendMessage({ action: "syncTime", payload: window.video.currentTime })
-        }
+    else if (event.type == "seeking") {
+        console.log("SEEKING")
+        window.lastSyncedTime = window.video.currentTime
+        chrome.runtime.sendMessage({ action: "syncTime", payload: window.video.currentTime })
     }
 }
 
@@ -44,14 +44,17 @@ if (typeof window.addListeners !== "undefined") {
         if (video !== null) {
             window.video.addEventListener("play", handleEvent)
             window.video.addEventListener("pause", handleEvent)
-            window.video.addEventListener("onseeking", handleEvent)
+            window.video.addEventListener("seeking", handleEvent)
             window.video.setAttribute("hasListeners", "true")
+            
+            chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
         }
     }
 }
 
 window.onload = () => {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        console.log(`REQUEST: ${request.action}`)
         if (request.action == "connected" && typeof window.video == "undefined") {
             let video = getVideoElement()
             if (video !== null) {
@@ -59,7 +62,7 @@ window.onload = () => {
 
                 window.video.addEventListener("play", handleEvent)
                 window.video.addEventListener("pause", handleEvent)
-                window.video.addEventListener("onseeking", handleEvent)
+                window.video.addEventListener("seeking", handleEvent)
                 window.video.setAttribute("hasListeners", "true")
 
                 chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
@@ -87,8 +90,9 @@ window.onload = () => {
 
                 window.video.addEventListener("play", handleEvent)
                 window.video.addEventListener("pause", handleEvent)
-                window.video.addEventListener("onseeking", handleEvent)
+                window.video.addEventListener("seeking", handleEvent)
                 window.video.setAttribute("hasListeners", "true")
+                
                 chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
             }
         }
