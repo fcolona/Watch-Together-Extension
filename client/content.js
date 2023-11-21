@@ -10,7 +10,7 @@ function getVideoElement() {
         window.lastSyncedTime = videoFound.currentTime
     }
     console.log(videoFound)
-
+    
     return videoFound
 }
 
@@ -35,6 +35,7 @@ function handleEvent(event) {
     }
 }
 
+
 //addListeners comes as true when changing tabs
 //And comes as undefined, when not 
 if (typeof window.addListeners !== "undefined") {
@@ -46,10 +47,20 @@ if (typeof window.addListeners !== "undefined") {
             window.video.addEventListener("pause", handleEvent)
             window.video.addEventListener("seeking", handleEvent)
             window.video.setAttribute("hasListeners", "true")
-            
+
             chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
         }
     }
+    //Reset the control variable so that it doesn't give false positives
+    //About whether or not the user is changin tabs
+    window.addListeners = undefined
+}
+
+if (typeof window.checkUrl !== "undefined"){
+    if(window.checkUrl == true && typeof window.video !== "undefined"){
+        chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
+    }
+    window.checkUrl = undefined
 }
 
 window.onload = () => {
@@ -81,7 +92,6 @@ window.onload = () => {
         }
     })
 
-
     chrome.runtime.sendMessage({ action: "checkState" }, response => {
         if (response.isConnectionOpen && response.roomId !== "") {
             let video = getVideoElement()
@@ -92,7 +102,7 @@ window.onload = () => {
                 window.video.addEventListener("pause", handleEvent)
                 window.video.addEventListener("seeking", handleEvent)
                 window.video.setAttribute("hasListeners", "true")
-                
+
                 chrome.runtime.sendMessage({ action: "updateUrl", payload: window.parent.location.href })
             }
         }

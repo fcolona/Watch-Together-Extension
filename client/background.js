@@ -145,3 +145,14 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     }
 });
 
+chrome.tabs.onUpdated.addListener((tabId) => {
+    if (isConnectionOpen && roomId !== "") {
+        chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            args: [{ checkUrl: true }],
+            func: vars => Object.assign(self, vars),
+        }, () => {
+            chrome.scripting.executeScript({ target: { tabId: tabId }, files: ['content.js'] });
+        });
+    }
+});
