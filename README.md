@@ -1,5 +1,5 @@
 # Watch Together
-## Watch Together is a chrome extension that allows users to sync a video player and watch together!
+## A chrome extension that allows users to sync a video player and watch together!
 
 This project consists of both an extension and a server that, together, provide a way to watch any video content on the internet in real time with other users. In that sense, the extension syncs all the actions the users do to the video player, such as: pause, play, skip and so on. The sync is made simply by connecting to a room, without a limit of users, created beforehand.
 
@@ -22,4 +22,4 @@ This project consists of both an extension and a server that, together, provide 
 * Saas
 
 ## Try it out!
-Watch Together is available to download freely on the [Chrome Web Store](watchtogether.tech)
+Watch Together is available to download freely on the [Chrome Web Store](http://watchtogether.tech)
