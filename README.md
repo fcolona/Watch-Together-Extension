@@ -22,4 +22,4 @@ This project consists of both an extension and a server that, together, provide 
 * Saas
 
 ## Try it out!
-Watch Together is available to download freely on the [Chrome Web Store](http://watchtogether.tech)
+Watch Together is available to download freely on the [Chrome Web Store](http://watchtogether.site)

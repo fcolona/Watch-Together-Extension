@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action == "connect") {
         //Setup WebSocket
-        ws = new WebSocket("ws://watchtogether.tech")
+        ws = new WebSocket("ws://watchtogether.site")
 
         //Open connection
         ws.onopen = (event) => {
